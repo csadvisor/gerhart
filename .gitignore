@@ -1,0 +1,14 @@
+cache
+config
+core
+errors
+helpers
+hooks
+index.html
+language
+libraries
+logs
+models
+third_party
+views
+.htaccess
