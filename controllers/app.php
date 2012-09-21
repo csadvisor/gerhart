@@ -59,9 +59,8 @@ class App extends CI_Controller {
       }
 
     $error = $petition->update();
-
     if (!empty($error))
-      return $this->sendError(null);
+      return $this->sendError($error);
 
     $this->send($petition->attributes());
   }

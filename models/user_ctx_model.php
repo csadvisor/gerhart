@@ -5,6 +5,8 @@ class User_ctx_model extends CI_Model {
     var $id = 13725;
     var $first_name = 'Joe';
     var $last_name  = 'Schmoe';
+    #var $role = 'admin';
+    #var $role = 'advisor';
     var $role = 'advisee';
 
     function __construct()
@@ -25,6 +27,12 @@ class User_ctx_model extends CI_Model {
         'first_name' => $this->first_name,
         'last_name' => $this->last_name
       );
+    }
+
+    function role()
+    {
+      return $this->role;
+
     }
 
     /*

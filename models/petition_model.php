@@ -117,8 +117,55 @@ class Petition_model extends CI_Model {
         }
     }
 
+    function valError($reason)
+    {
+      return array(
+        'statusCode' => 403,
+        'error' => 'Forbidden',
+        'reason' => $reason
+      );
+    }
+
     private function validate($oldDoc) {
-      // TODO: validate state transitions
+
+      $curState = $this->_get('state');
+
+      if (empty($oldDoc)) {
+        if ($curState != 'pending')
+          return $this->valError('New petitions must start as pending');
+        return;
+      }
+
+      $oldState = $oldDoc->state;
+      $newState = $this->_get('state');
+
+      switch ($newState)
+      {
+        case 'pending':
+          if ($oldState != 'pending')
+            return $this->valError('Can only edit a pending petition');
+          if ($this->User_ctx_model->role() != 'advisee') # someone else's advisor could do this
+            return $this->valError('Only advisee edit pending petitions');
+          break;
+        case 'approved':
+          if ($oldState != 'pending' && $oldState != 'rejected')
+            return $this->valError('Must go from {pending,rejected} => processed');
+          if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
+            return $this->valError('Only admins can mark a petition as processed');
+          break;
+        case 'rejected':
+          if ($oldState != 'pending' && $oldState != 'approved')
+            return $this->valError('Must go from {pending,approved} => rejected');
+          if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
+            return $this->valError('Only admins can mark a petition as processed');
+          break;
+        case 'processed':
+          if ($oldState != 'approved')
+            return $this->valError('Must go from approved => processed');
+          if ($this->User_ctx_model->role() != 'admin')
+            return $this->valError('Only admins can mark a petition as processed');
+          break;
+      }
     }
 
 }
