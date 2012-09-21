@@ -2,9 +2,12 @@
 
 class App extends CI_Controller {
 
-	/**
-    * Switches between all routes for petitions
-	 */
+  function __construct()
+  {
+    parent::__construct();
+    $this->load->model('Petition_model', '', TRUE);
+  }
+
 	public function petitions($id = null)
 	{
     switch ($_SERVER['REQUEST_METHOD'])
@@ -27,13 +30,32 @@ class App extends CI_Controller {
     }
 	}
 
-  function _get($id = null) {
+  function _get($id = null)
+  {
     if (isset($id)) { return $this->_get_id($id); }
 
-    echo '/petitions';
+    $this->send($this->Petition_model->all());
   }
 
-  function _get_id($id) {
-    echo '/petitions/'.$id;
+  function _get_id($id)
+  {
+    $this->send($this->Petition_model->find($id));
+  }
+
+
+  /*
+   * Send
+   */
+  function send($response)
+  {
+    if (empty($response))
+      {
+        show_404();
+        #echo '404';
+      }
+    else
+      {
+        echo json_encode($response);
+      }
   }
 }
