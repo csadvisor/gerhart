@@ -13,11 +13,10 @@ class App extends CI_Controller {
     switch ($_SERVER['REQUEST_METHOD'])
     {
     case 'GET':
-      //echo 'GET';
       $this->_get($id);
           break;
     case 'POST':
-      echo 'POST';
+      $this->_post();
           break;
     case 'PUT':
       echo 'PUT';
@@ -42,6 +41,13 @@ class App extends CI_Controller {
     $this->send($this->Petition_model->find($id));
   }
 
+  function _post()
+  {
+    $petition = $this->parsePetition();
+    $petition->create();
+    $this->send($petition->attributes());
+  }
+
 
   /*
    * Send
@@ -57,5 +63,14 @@ class App extends CI_Controller {
       {
         echo json_encode($response);
       }
+  }
+
+  function parsePetition()
+  {
+    $data = file_get_contents('php://input');
+    $data = json_decode($data, true);
+    $petition = new $this->Petition_model;
+    $petition->loadAttributes($data);
+    return $petition;
   }
 }
