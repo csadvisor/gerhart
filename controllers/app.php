@@ -6,6 +6,12 @@ class App extends CI_Controller {
   {
     parent::__construct();
     $this->load->model('Petition_model', '', TRUE);
+    $this->load->model('User_ctx_model', '', TRUE);
+  }
+
+  public function user_ctx()
+  {
+    $this->send($this->User_ctx_model->get());
   }
 
 	public function petitions($id = null)
@@ -22,7 +28,7 @@ class App extends CI_Controller {
       $this->_put_id($id);
           break;
     case 'DELETE':
-      echo 'DELETE';
+      echo 'DELETE is not yet implemented';
           break;
     default:
       echo 'HTTP method not supported';
