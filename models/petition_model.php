@@ -34,9 +34,8 @@ class Petition_model extends CI_Model {
      */
     function all()
     {
-      $query = $this->db->get_where($this->TABLE_NAME, array(
-        'student_id' => $this->User_ctx_model->id()
-      ));
+      $criteria = $this->User_ctx_model->addRoleFKey(array());
+      $query = $this->db->get_where($this->TABLE_NAME, $criteria);
       return $query->result();
     }
 
@@ -45,11 +44,8 @@ class Petition_model extends CI_Model {
      */
     function find($id)
     {
-      $query = $this->db->get_where($this->TABLE_NAME, array(
-        'id' => $id,
-        'student_id' => $this->User_ctx_model->id()
-
-      ), 1);
+      $criteria = $this->User_ctx_model->addRoleFKey(array('id' => $id));
+      $query = $this->db->get_where($this->TABLE_NAME, $criteria, 1);
       $result = $query->result();
       if (empty($result)) {
         return null;
@@ -74,7 +70,6 @@ class Petition_model extends CI_Model {
 
     function create()
     {
-      $this->_assignDefaults();
       $this->db->insert($this->TABLE_NAME, $this->attributes());
       # TODO: retrieve record and send back ctime, mtime
       $this->_set('id', $this->db->insert_id());
@@ -82,10 +77,17 @@ class Petition_model extends CI_Model {
 
     function update()
     {
-      // todo validate state transitions
-      $this->db->update($this->TABLE_NAME, $this->attributes, array(
-        'id' => $this->User_ctx_model->id()
-      ));
+      $oldDoc = $this->find($this->_get('id'));
+      if (empty($oldDoc))
+        return array('statusCode' => 404, 'error' => 'Not found', 'reason' => 'Document not found');
+      $errors = $this->validate($oldDoc);
+
+      if (!empty($errors))
+        return $errors;
+
+      $criteria = $this->User_ctx_model->addRoleFKey(array('id' => $this->_get('id')));
+      $this->db->where('id', $this->_get('id'));
+      $this->db->update($this->TABLE_NAME, $this->attributes());
     }
 
 
@@ -98,37 +100,72 @@ class Petition_model extends CI_Model {
       return in_array($key, $this->fields);
     }
 
-    private function _assignDefaults()
-    {
-      $this->loadAttributes(array(
-        'student_id' => $this->User_ctx_model->id(),
-        'state' => 'pending'
-      ));
-    }
-
     private function _set($name, $value)
     {
       if ($this->_isField($name) && !empty($name) && !empty($value))
           $this->_attributes[$name] = $value;
     }
 
+    function get($name) { $this->_get($name); }
+
     private function _get($name)
     {
-      if ($this->_isField($name) && array_key_exists($this->attributes(), $name))
+      if ($this->_isField($name) && array_key_exists($name, $this->attributes()))
         {
           $attributes = $this->attributes();
           return $attributes[$name];
         }
     }
 
-    #function update_entry()
-    #{
-    #    $this->title   = $_POST['title'];
-    #    $this->content = $_POST['content'];
-    #    $this->date    = time();
+    function valError($reason)
+    {
+      return array(
+        'statusCode' => 403,
+        'error' => 'Forbidden',
+        'reason' => $reason
+      );
+    }
 
-    #    $this->db->update('entries', $this, array('id' => $_POST['id']));
-    #}
-    
+    private function validate($oldDoc) {
+
+      $curState = $this->_get('state');
+
+      if (empty($oldDoc)) {
+        if ($curState != 'pending')
+          return $this->valError('New petitions must start as pending');
+        return;
+      }
+
+      $oldState = $oldDoc->state;
+      $newState = $this->_get('state');
+
+      switch ($newState)
+      {
+        case 'pending':
+          if ($oldState != 'pending')
+            return $this->valError('Can only edit a pending petition');
+          if ($this->User_ctx_model->role() != 'advisee') # someone else's advisor could do this
+            return $this->valError('Only advisee edit pending petitions');
+          break;
+        case 'approved':
+          if ($oldState != 'pending' && $oldState != 'rejected')
+            return $this->valError('Must go from {pending,rejected} => processed');
+          if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
+            return $this->valError('Only admins can mark a petition as processed');
+          break;
+        case 'rejected':
+          if ($oldState != 'pending' && $oldState != 'approved')
+            return $this->valError('Must go from {pending,approved} => rejected');
+          if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
+            return $this->valError('Only admins can mark a petition as processed');
+          break;
+        case 'processed':
+          if ($oldState != 'approved')
+            return $this->valError('Must go from approved => processed');
+          if ($this->User_ctx_model->role() != 'admin')
+            return $this->valError('Only admins can mark a petition as processed');
+          break;
+      }
+    }
 
 }
