@@ -19,13 +19,13 @@ class App extends CI_Controller {
       $this->_post();
           break;
     case 'PUT':
-      echo 'PUT';
+      $this->_put_id($id);
           break;
     case 'DELETE':
       echo 'DELETE';
           break;
     default:
-      echo 'ELSE';
+      echo 'HTTP method not supported';
     }
 	}
 
@@ -48,6 +48,23 @@ class App extends CI_Controller {
     $this->send($petition->attributes());
   }
 
+  function _put_id($id)
+  {
+    $petition = $this->parsePetition();
+
+    if ($petition->get('id') == $id)
+      {
+        $error = array('statusCode' => 400, 'error' => 'Bad request', 'reason' => 'Body id doesnt make url id');
+        return $this->sendError($error);
+      }
+
+    $error = $petition->update();
+
+    if (!empty($error))
+      return $this->sendError(null);
+
+    $this->send($petition->attributes());
+  }
 
   /*
    * Send
@@ -56,13 +73,20 @@ class App extends CI_Controller {
   {
     if (empty($response))
       {
-        show_404();
+        #show_404();
         #echo '404';
+        $this->sendError(array('statusCode' => 404, 'reason' => 'Not found'));
       }
     else
       {
         echo json_encode($response);
       }
+  }
+  
+  function sendError($error)
+  {
+    # TODO: add Status Code
+    $this->send($error);
   }
 
   function parsePetition()

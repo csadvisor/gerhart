@@ -5,6 +5,7 @@ class User_ctx_model extends CI_Model {
     var $id = 13725;
     var $first_name = 'Joe';
     var $last_name  = 'Schmoe';
+    var $role = 'advisee';
 
     function __construct()
     {
@@ -44,4 +45,20 @@ class User_ctx_model extends CI_Model {
       return $this->id;
     }
 
+    function addRoleFKey($criteria)
+    {
+      switch ($this->role)
+      {
+      case 'advisee':
+        $criteria['student_id'] = $this->id();
+            break;
+      case 'advisor':
+        $criteria['advisor_id'] = $this->id();
+            break;
+      case 'admin':
+        // admin get all petitions
+            break;
+      default:
+      }
+    }
 }

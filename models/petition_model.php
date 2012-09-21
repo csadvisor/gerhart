@@ -34,9 +34,8 @@ class Petition_model extends CI_Model {
      */
     function all()
     {
-      $query = $this->db->get_where($this->TABLE_NAME, array(
-        'student_id' => $this->User_ctx_model->id()
-      ));
+      $criteria = $this->User_ctx_model->addRoleFKey(array());
+      $query = $this->db->get_where($this->TABLE_NAME, $criteria);
       return $query->result();
     }
 
@@ -45,11 +44,8 @@ class Petition_model extends CI_Model {
      */
     function find($id)
     {
-      $query = $this->db->get_where($this->TABLE_NAME, array(
-        'id' => $id,
-        'student_id' => $this->User_ctx_model->id()
-
-      ), 1);
+      $criteria = $this->User_ctx_model->addRoleFKey(array('id' => $id));
+      $query = $this->db->get_where($this->TABLE_NAME, $criteria, 1);
       $result = $query->result();
       if (empty($result)) {
         return null;
@@ -74,7 +70,6 @@ class Petition_model extends CI_Model {
 
     function create()
     {
-      $this->_assignDefaults();
       $this->db->insert($this->TABLE_NAME, $this->attributes());
       # TODO: retrieve record and send back ctime, mtime
       $this->_set('id', $this->db->insert_id());
@@ -82,10 +77,17 @@ class Petition_model extends CI_Model {
 
     function update()
     {
-      // todo validate state transitions
-      $this->db->update($this->TABLE_NAME, $this->attributes, array(
-        'id' => $this->User_ctx_model->id()
-      ));
+      $oldDoc = $this->find($this->_get('id'));
+      if (empty($oldDoc))
+        return array('statusCode' => 404, 'error' => 'Not found', 'reason' => 'Document not found');
+      $errors = $this->validate($oldDoc);
+
+      if (!empty($errors))
+        return $errors;
+
+      $criteria = $this->User_ctx_model->addRoleFKey(array('id' => $this->_get('id')));
+      $this->db->where('id', $this->_get('id'));
+      $this->db->update($this->TABLE_NAME, $this->attributes());
     }
 
 
@@ -98,37 +100,25 @@ class Petition_model extends CI_Model {
       return in_array($key, $this->fields);
     }
 
-    private function _assignDefaults()
-    {
-      $this->loadAttributes(array(
-        'student_id' => $this->User_ctx_model->id(),
-        'state' => 'pending'
-      ));
-    }
-
     private function _set($name, $value)
     {
       if ($this->_isField($name) && !empty($name) && !empty($value))
           $this->_attributes[$name] = $value;
     }
 
+    function get($name) { $this->_get($name); }
+
     private function _get($name)
     {
-      if ($this->_isField($name) && array_key_exists($this->attributes(), $name))
+      if ($this->_isField($name) && array_key_exists($name, $this->attributes()))
         {
           $attributes = $this->attributes();
           return $attributes[$name];
         }
     }
 
-    #function update_entry()
-    #{
-    #    $this->title   = $_POST['title'];
-    #    $this->content = $_POST['content'];
-    #    $this->date    = time();
-
-    #    $this->db->update('entries', $this, array('id' => $_POST['id']));
-    #}
-    
+    private function validate($oldDoc) {
+      // TODO: validate state transitions
+    }
 
 }
