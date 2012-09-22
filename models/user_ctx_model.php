@@ -6,7 +6,7 @@ class User_ctx_model extends CI_Model {
     {
         parent::__construct();
         $csid = getenv("WEBAUTH_USER");
-        $csid = 'dan.boneh';
+        #$csid = 'dan.boneh';
         $query = $this->db->get_where('people', array('primary_csalias' => $csid), 1);
         $result = $query->result();
         $result = $result[0];
