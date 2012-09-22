@@ -14,14 +14,14 @@ class User_ctx_model extends CI_Model {
         #$csid = 'monica.lam'; # my advisor
         #$csid = 'dan.boneh'; # another advisor
         #$csid = 'twangcat'; # another MSCS student
-        #$csid = 'hutchin'; # admin
         #$csid = 'stager'; # admin
+        #$csid = 'miles'; # should not be involved
         
         $query = $this->db->get_where('people', array('primary_csalias' => $csid), 1);
         $result = $query->result();
         $result = $result[0];
 
-        $this->id = $result->id;
+        $this->id = intval($result->id);
         $this->first_name = $result->nam_friendly;
         $this->last_name = $result->nam_last;
 
@@ -36,12 +36,20 @@ class User_ctx_model extends CI_Model {
      */
     function get()
     {
-      return array(
-        'id' => $this->id,
-        'first_name' => $this->first_name,
-        'last_name' => $this->last_name,
-        'role' => $this->role
+      $result = array(
+          'id' => $this->id,
+          'first_name' => $this->first_name,
+          'last_name' => $this->last_name
       );
+
+      if (!is_null($this->role))
+        $result['role'] = $this->role;
+
+      if ($this->role == 'advisee')
+        $result['advisor_id'] = $this->advisorId();
+
+
+      return $result;
     }
 
     function role()
@@ -77,6 +85,16 @@ class User_ctx_model extends CI_Model {
       return $criteria;
     }
 
+    function advisorId()
+    {
+      if ($this->role() != 'advisee') return null;
+
+      $query = $this->db->get_where('mscsactive', array('person_id' => $this->id()), 1);
+      $result = $query->result();
+      return intval($result[0]->advisor_id);
+    }
+
+
     private function _getRole($id)
     {
         $query = $this->db->get_where('people_relations', array('person_id' => $id));
@@ -108,5 +126,6 @@ class User_ctx_model extends CI_Model {
                 return 'admin';
               }
           }
+        return null;
     }
 }

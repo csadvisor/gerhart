@@ -54,8 +54,11 @@ class App extends CI_Controller {
   function _post()
   {
     $petition = $this->parsePetition();
-    $petition->create();
-    $this->send($petition->attributes());
+    $error = $petition->create();
+    if (!is_null($error))
+      $this->sendError($error);
+    else
+      $this->send($petition->attributes());
   }
 
   function _put_id($id)

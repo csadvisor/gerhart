@@ -119,6 +119,7 @@ class Petition_model extends CI_Model {
         $attributes = $this->attributes();
         return $attributes[$name];
       }
+    return null;
   }
 
   function valError($reason)
@@ -130,7 +131,7 @@ class Petition_model extends CI_Model {
     );
   }
 
-  private function validate($oldDoc)
+  private function validate($oldDoc = null)
   {
 
     $curState = $this->_get('state');
@@ -143,8 +144,12 @@ class Petition_model extends CI_Model {
       {
         if ($curState != 'pending')
           return $this->valError('New petitions must start as pending');
-        if ($this->_get('student_id') != $this->User_ctx_model->id());
+
+        if ($this->_get('student_id') != $this->User_ctx_model->id())
           return $this->valError('You must create a petiton for yourself');
+
+        if ($this->_get('advisor_id') != $this->User_ctx_model->advisorId())
+          return $this->valError('You must create a petiton the correct advisor');
 
         return;
       }
