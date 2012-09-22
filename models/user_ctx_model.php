@@ -6,7 +6,17 @@ class User_ctx_model extends CI_Model {
     {
         parent::__construct();
         $csid = getenv("WEBAUTH_USER");
-        #$csid = 'dan.boneh';
+
+        #
+        # Testing with using other peoples CSIDs
+        #
+        
+        #$csid = 'monica.lam'; # my advisor
+        #$csid = 'dan.boneh'; # another advisor
+        #$csid = 'twangcat'; # another MSCS student
+        #$csid = 'hutchin'; # admin
+        #$csid = 'stager'; # admin
+        
         $query = $this->db->get_where('people', array('primary_csalias' => $csid), 1);
         $result = $query->result();
         $result = $result[0];
@@ -37,7 +47,6 @@ class User_ctx_model extends CI_Model {
     function role()
     {
       return $this->role;
-
     }
 
     /*
@@ -48,13 +57,6 @@ class User_ctx_model extends CI_Model {
      */
     function id()
     {
-      #$query = $this->db->get_where('users', array('id' => $this->id), 1);
-      #$result = $query->result();
-      #if (empty($result)) {
-      #  return null;
-      #}
-      #return $result[0];
-
       return $this->id;
     }
 
@@ -71,8 +73,8 @@ class User_ctx_model extends CI_Model {
       case 'admin':
         // admin get all petitions
             break;
-      default:
       }
+      return $criteria;
     }
 
     private function _getRole($id)

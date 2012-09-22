@@ -44,7 +44,11 @@ class App extends CI_Controller {
 
   function _get_id($id)
   {
-    $this->send($this->Petition_model->find($id));
+    $petition = $this->Petition_model->find($id);
+    if (is_null($petition))
+      $this->sendError(array('statusCode' => 404, 'reason' => 'Not found'));
+    else
+      $this->send($this->Petition_model->find($id));
   }
 
   function _post()
@@ -76,21 +80,13 @@ class App extends CI_Controller {
    */
   function send($response)
   {
-    if (empty($response))
-      {
-        #show_404();
-        #echo '404';
-        $this->sendError(array('statusCode' => 404, 'reason' => 'Not found'));
-      }
-    else
-      {
-        echo json_encode($response);
-      }
+    echo json_encode($response);
   }
   
   function sendError($error)
   {
     # TODO: add Status Code
+    header("HTTP/1.1 ".$error['statusCode']." ".$error['reason']);
     $this->send($error);
   }
 
