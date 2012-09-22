@@ -10,6 +10,11 @@ libraries
 logs
 third_party
 views
-.htaccess
 javascripts
 stylesheets
+.htaccess
+.svn
+css
+js
+static
+datamapper
