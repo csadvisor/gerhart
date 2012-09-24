@@ -16,6 +16,8 @@ class User_ctx_model extends CI_Model {
         #$csid = 'twangcat'; # another MSCS student
         #$csid = 'stager'; # admin
         #$csid = 'miles'; # should not be involved
+
+        $this->csid = $csid;
         
         $query = $this->db->get_where('people', array('primary_csalias' => $csid), 1);
         $result = $query->result();
@@ -57,6 +59,11 @@ class User_ctx_model extends CI_Model {
       return $this->role;
     }
 
+    function csid()
+    {
+      return $this->csid;
+    }
+
     /*
      * id
      *
@@ -93,7 +100,6 @@ class User_ctx_model extends CI_Model {
       $result = $query->result();
       return intval($result[0]->advisor_id);
     }
-
 
     private function _getRole($id)
     {

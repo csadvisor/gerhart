@@ -101,4 +101,31 @@ class App extends CI_Controller {
     $petition->loadAttributes($data);
     return $petition;
   }
+
+  /* render transcript */
+  function transcript ($csid = NULL) {
+    $this->load->helper('file');
+
+    if (!is_null($csid)) {
+
+      # TODO: Don't let someone elses advisor look at your transcript?
+      #$is_viewers_advisee    = $viewing_csid == $advisor_csid;
+      #if (!($is_admin or $is_viewers_advisee or $is_viewers_transcript)) {
+      
+      $is_viewers_transcript = $this->User_ctx_model->csid() == $csid;
+      $is_advisor = $this->User_ctx_model->role() == 'advisor';
+      $is_admin = $this->User_ctx_model->role() == 'admin';
+
+      if (!($is_admin or $is_advisor or $is_viewers_transcript)) {
+          echo 'You are unauthorized to view this transcript';
+          return;
+      }
+
+    } else {
+      $csid = $this->User_ctx_model->csid();
+    }
+
+    header('Content-Type: application/pdf');
+    echo read_file('./system/application/static/'.$csid.'.pdf');
+  }
 }
