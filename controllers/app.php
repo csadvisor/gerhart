@@ -7,6 +7,7 @@ class App extends CI_Controller {
     parent::__construct();
     $this->load->model('Petition_model', '', TRUE);
     $this->load->model('User_ctx_model', '', TRUE);
+    $this->load->helper(array('form', 'url'));
   }
 
   public function user_ctx()
@@ -104,7 +105,11 @@ class App extends CI_Controller {
 
   /* render transcript */
   function transcript ($csid = NULL) {
-    $this->load->helper('file');
+
+    #
+    # VALIDATE
+    # Make sure user has correct permissions to view/upload transcript
+    #
 
     if (!is_null($csid)) {
 
@@ -125,7 +130,41 @@ class App extends CI_Controller {
       $csid = $this->User_ctx_model->csid();
     }
 
-    header('Content-Type: application/pdf');
-    echo read_file('./system/application/static/'.$csid.'.pdf');
+    #
+    # FILE I/O
+    # Get or write transcript .pdf file
+    #
+
+    $this->load->helper('file');
+
+    /* handle post to this URL */
+    $post = $_SERVER['REQUEST_METHOD'] == 'POST';
+    if ($post)
+      {
+        $config['upload_path'] = './system/application/static/';
+        $config['allowed_types'] = 'pdf';
+        $config['overwrite'] = True;
+        $config['max_size'] = 10000; // 10 MB max
+        $config['file_name'] = $csid;
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload())
+          {
+            $error = $this->upload->display_errors();
+            header("HTTP/1.1 400 Bad request");
+            echo $error;
+          }
+        else
+          {
+            redirect(site_url('/'));
+          }
+      }
+    else
+      {
+        // TODO only do this on get requests
+        header('Content-Type: application/pdf');
+        echo read_file('./system/application/static/'.$csid.'.pdf');
+      }
   }
 }

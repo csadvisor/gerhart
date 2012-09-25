@@ -47,9 +47,11 @@ class User_ctx_model extends CI_Model {
       if (!is_null($this->role))
         $result['role'] = $this->role;
 
+      if ($this->transcriptUploaded())
+        $result['transcript'] = true; 
+
       if ($this->role == 'advisee')
         $result['advisor_id'] = $this->advisorId();
-
 
       return $result;
     }
@@ -62,6 +64,11 @@ class User_ctx_model extends CI_Model {
     function csid()
     {
       return $this->csid;
+    }
+
+    function transcriptUploaded()
+    {
+      return file_exists('./system/application/static/'.$this->csid.'.pdf');
     }
 
     /*
