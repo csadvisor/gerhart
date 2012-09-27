@@ -16,10 +16,17 @@ class User_ctx_model extends CI_Model {
         #$csid = 'twangcat'; # another MSCS student
         #$csid = 'stager'; # admin
         #$csid = 'miles'; # should not be involved
+        #$csid = 'nicole';
 
         $this->csid = $csid;
         
-        $query = $this->db->get_where('people', array('primary_csalias' => $csid), 1);
+        # look up person_id
+        $query = $this->db->get_where('csaliases', array('cs_name' => $csid), 1);
+        $result = $query->result();
+        $result = $result[0];
+
+        # look up person entry
+        $query = $this->db->get_where('people', array('id' => $result->person_id), 1);
         $result = $query->result();
         $result = $result[0];
 
