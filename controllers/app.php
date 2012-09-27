@@ -104,20 +104,20 @@ class App extends CI_Controller {
   }
 
   /* render transcript */
-  function transcript ($csid = NULL) {
+  function transcript ($id = NULL) {
 
     #
     # VALIDATE
     # Make sure user has correct permissions to view/upload transcript
     #
 
-    if (!is_null($csid)) {
+    if (!is_null($id)) {
 
       # TODO: Don't let someone elses advisor look at your transcript?
       #$is_viewers_advisee    = $viewing_csid == $advisor_csid;
       #if (!($is_admin or $is_viewers_advisee or $is_viewers_transcript)) {
       
-      $is_viewers_transcript = $this->User_ctx_model->csid() == $csid;
+      $is_viewers_transcript = $this->User_ctx_model->id() == $id;
       $is_advisor = $this->User_ctx_model->role() == 'advisor';
       $is_admin = $this->User_ctx_model->role() == 'admin';
 
@@ -127,7 +127,7 @@ class App extends CI_Controller {
       }
 
     } else {
-      $csid = $this->User_ctx_model->csid();
+      $id = $this->User_ctx_model->id();
     }
 
     #
@@ -145,7 +145,7 @@ class App extends CI_Controller {
         $config['allowed_types'] = 'pdf';
         $config['overwrite'] = True;
         $config['max_size'] = 10000; // 10 MB max
-        $config['file_name'] = $csid;
+        $config['file_name'] = $id;
 
         $this->load->library('upload', $config);
 
@@ -164,7 +164,7 @@ class App extends CI_Controller {
       {
         // TODO only do this on get requests
         header('Content-Type: application/pdf');
-        echo read_file('./system/application/static/'.$csid.'.pdf');
+        echo read_file('./system/application/static/'.$id.'.pdf');
       }
   }
 }

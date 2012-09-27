@@ -17,6 +17,8 @@ class User_ctx_model extends CI_Model {
         #$csid = 'stager'; # admin
         #$csid = 'miles'; # should not be involved
         #$csid = 'nicole';
+        #$csid = 'roycecy';
+        #$csid = 'coopers';
 
         $this->csid = $csid;
         
@@ -75,7 +77,7 @@ class User_ctx_model extends CI_Model {
 
     function transcriptUploaded()
     {
-      return file_exists('./system/application/static/'.$this->csid.'.pdf');
+      return file_exists('./system/application/static/'.$this->id.'.pdf');
     }
 
     /*
