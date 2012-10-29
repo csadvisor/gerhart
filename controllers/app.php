@@ -157,7 +157,9 @@ class App extends CI_Controller {
           }
         else
           {
-            redirect(site_url('/'));
+            # HACK: would be nice to use redirect or something here
+            header('HTTP/1.1 301 Moved Permanently');
+            header('Location: http://bit.ly/cs_petitions');
           }
       }
     else
