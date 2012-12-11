@@ -35,6 +35,7 @@ class Petition_model extends CI_Model {
   function all()
   {
     $criteria = $this->User_ctx_model->addRoleFKey(array());
+    $this->db->join('people', 'people.id = petitions.student_id');
     $query = $this->db->get_where($this->TABLE_NAME, $criteria);
     return $query->result();
   }
