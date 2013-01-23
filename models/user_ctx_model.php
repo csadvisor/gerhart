@@ -35,6 +35,7 @@ class User_ctx_model extends CI_Model {
         $this->id = intval($result->id);
         $this->first_name = $result->nam_friendly;
         $this->last_name = $result->nam_last;
+        $this->email_address = $result->email_acct . '@' . $result->email_host;
 
         $this->role = $this->_getRole($this->id);
     }

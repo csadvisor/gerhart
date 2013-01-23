@@ -205,6 +205,7 @@ class Petition_model extends CI_Model {
         }
       }
   }
+
   function send_created_notification() {
     $advisorId = $this->User_ctx_model->advisorId();
     $query = $this->db->get_where('people', array('id' => $advisorId), 1);
@@ -212,26 +213,31 @@ class Petition_model extends CI_Model {
     $result = $result[0];
 
     $to = $result->email_acct . '@' . $result->email_host;
+    $to = $to . ', ' . $this->User_ctx_model->email_address;
 
-    #// The message
-    $message = "Advisor " . $result->nam_last . ",\r\n";
-    $message = $message . "\r\n";
-    $message = $message . "Your advisee " . $this->User_ctx_model->fullName();
-    $message = $message . " just created a petition. Please review it here, ";
-    $message = $message . "http://j.mp/cs_petitions.\r\n";
-    $message = $message . "\r\n";
-    $message = $message . "Sincerely,\r\n";
-    $message = $message . "MSCS Petitions Robot\r\n";
-    $message = $message . "\r\n";
-    $message = $message . "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n";
+    $studentName = $this->User_ctx_model->fullName();
+    $subject = 'Your advisee, ' . $studentName . ', just created an MSCS waiver request';
 
-    echo $message;
+    // The message
+    $m = '';
+    $m = $m . "Advisor " . $result->nam_last . ",";
+    $m = $m . "\r\n\r\n";
+    $m = $m . "Your advisee, " . $studentName . ", just created a petition. ";
+    $m = $m . "\"Approve\" or \"Decline\" their request here, ";
+    $m = $m . "http://j.mp/cs_petitions. If you want to talk with your advisee";
+    $m = $m . "in person before making a decision then \"Reply All\" to this ";
+    $m = $m . "email and tell them your availability.";
+    $m = $m . "\r\n\r\n";
+    $m = $m . "Sincerely,\r\n";
+    $m = $m . "MSCS Petitions Robot\r\n";
+    $m = $m . "\r\n";
+    $m = $m . "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n";
 
-    #// In case any of our lines are larger than 70 characters, we should use wordwrap()
-    #$message = wordwrap($message, 70, "\r\n");
+    // In case any of our lines are larger than 70 characters, we should use wordwrap()
+    $message = wordwrap($m, 70, "\r\n");
    
-    #// Send
-    #mail('jack.dubie@gmail.com', 'My Subject', $message);
+    // Send
+    mail($to, $subject, $message);
   }
 
 }
