@@ -65,6 +65,11 @@ class User_ctx_model extends CI_Model {
       return $result;
     }
 
+    function fullName()
+    {
+      return $this->first_name . ' ' . $this->last_name;
+    }
+
     function role()
     {
       return $this->role;

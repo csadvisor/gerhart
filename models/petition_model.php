@@ -34,9 +34,12 @@ class Petition_model extends CI_Model {
    */
   function all()
   {
+    $peopleFields = 'people.nam_last, people.nam_friendly, people.email_acct, people.email_host';
     $criteria = $this->User_ctx_model->addRoleFKey(array());
+    $this->db->select($this->TABLE_NAME . '.*, ' . $peopleFields);
     $this->db->join('people', 'people.id = petitions.student_id');
     $query = $this->db->get_where($this->TABLE_NAME, $criteria);
+
     return $query->result();
   }
 
@@ -78,6 +81,8 @@ class Petition_model extends CI_Model {
     $this->db->insert($this->TABLE_NAME, $this->attributes());
     # TODO: retrieve record and send back ctime, mtime
     $this->_set('id', $this->db->insert_id());
+    
+    $this->send_created_notification();
   }
 
   function update()
@@ -192,6 +197,34 @@ class Petition_model extends CI_Model {
             break;
         }
       }
+  }
+  function send_created_notification() {
+    $advisorId = $this->User_ctx_model->advisorId();
+    $query = $this->db->get_where('people', array('id' => $advisorId), 1);
+    $result = $query->result();
+    $result = $result[0];
+
+    $to = $result->email_acct . '@' . $result->email_host;
+
+    #// The message
+    $message = "Advisor " . $result->nam_last . ",\r\n";
+    $message = $message . "\r\n";
+    $message = $message . "Your advisee " . $this->User_ctx_model->fullName();
+    $message = $message . " just created a petition. Please review it here, ";
+    $message = $message . "http://j.mp/cs_petitions.\r\n";
+    $message = $message . "\r\n";
+    $message = $message . "Sincerely,\r\n";
+    $message = $message . "MSCS Petitions Robot\r\n";
+    $message = $message . "\r\n";
+    $message = $message . "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n";
+
+    echo $message;
+
+    #// In case any of our lines are larger than 70 characters, we should use wordwrap()
+    #$message = wordwrap($message, 70, "\r\n");
+   
+    #// Send
+    #mail('jack.dubie@gmail.com', 'My Subject', $message);
   }
 
 }
