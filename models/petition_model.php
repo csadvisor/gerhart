@@ -57,6 +57,13 @@ class Petition_model extends CI_Model {
     return $result[0];
   }
 
+  /*
+   * delete
+   */
+  function delete($id)
+  {
+    $this->db->delete($this->TABLE_NAME, array('id' => $id)); 
+  }
 
   function loadAttributes($data)
   {

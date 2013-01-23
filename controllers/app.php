@@ -29,7 +29,7 @@ class App extends CI_Controller {
       $this->_put_id($id);
           break;
     case 'DELETE':
-      echo 'DELETE is not yet implemented';
+      $this->_delete($id);
           break;
     default:
       echo 'HTTP method not supported';
@@ -77,6 +77,15 @@ class App extends CI_Controller {
       return $this->sendError($error);
 
     $this->send($petition->attributes());
+  }
+
+  function _delete($id)
+  {
+    $petition = $this->Petition_model->find($id);
+    if (is_null($petition))
+      $this->sendError(array('statusCode' => 404, 'reason' => 'Not found'));
+    else
+      $this->Petition_model->delete($id);
   }
 
   /*
