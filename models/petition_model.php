@@ -34,7 +34,7 @@ class Petition_model extends CI_Model {
    */
   function all()
   {
-    $peopleFields = 'people.nam_last, people.nam_friendly, people.email_acct, people.email_host';
+    $peopleFields = 'people.nam_last, people.nam_friendly, people.primary_csalias';
     $criteria = $this->User_ctx_model->addRoleFKey(array());
     $this->db->select($this->TABLE_NAME . '.*, ' . $peopleFields);
     $this->db->join('people', 'people.id = petitions.student_id');
@@ -189,12 +189,18 @@ class Petition_model extends CI_Model {
               return $this->valError('Must go from {pending,rejected} => processed');
             if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
               return $this->valError('Only admins can mark a petition as processed');
+
+            $this->send_approved_notification();
+
             break;
           case 'rejected':
             if ($oldState != 'pending' && $oldState != 'approved')
               return $this->valError('Must go from {pending,approved} => rejected');
             if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
               return $this->valError('Only admins can mark a petition as processed');
+
+            $this->send_rejected_notification();
+
             break;
           case 'processed':
             if ($oldState != 'approved')
@@ -206,7 +212,15 @@ class Petition_model extends CI_Model {
       }
   }
 
+  function is_test()
+  {
+    if ($this->User_ctx_model->csid() == 'jdubie') return true;
+    return false;
+  }
+
   function send_created_notification() {
+    if ($this->is_test()) return;
+
     $advisorId = $this->User_ctx_model->advisorId();
     $query = $this->db->get_where('people', array('id' => $advisorId), 1);
     $result = $query->result();
@@ -214,6 +228,7 @@ class Petition_model extends CI_Model {
 
     $to = $result->email_acct . '@' . $result->email_host;
     $to = $to . ', ' . $this->User_ctx_model->email_address;
+    $to = $to . ', advisor@cs.stanford.edu';
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Your advisee, ' . $studentName . ', just created an MSCS waiver request';
@@ -236,6 +251,53 @@ class Petition_model extends CI_Model {
     // In case any of our lines are larger than 70 characters, we should use wordwrap()
     $message = wordwrap($m, 70, "\r\n");
    
+    // Send
+    mail($to, $subject, $message);
+  }
+
+  function send_approved_notification()
+  {
+    if ($this->is_test()) return;
+
+    $advisorId = $this->User_ctx_model->advisorId();
+    $query = $this->db->get_where('people', array('id' => $advisorId), 1);
+    $result = $query->result();
+    $result = $result[0];
+
+    $to = $result->email_acct . '@' . $result->email_host;
+    $to = $to . ', ' . $this->User_ctx_model->email_address;
+    $to = $to . ', advisor@cs.stanford.edu';
+
+    $studentName = $this->User_ctx_model->fullName();
+    $subject = 'Advisor ' . $result->nam_last . ' has APPROVED your MSCS waiver request (eom)';
+    
+    // In case any of our lines are larger than 70 characters, we should use wordwrap()
+    $message = wordwrap('', 70, "\r\n");
+
+    // Send
+    mail($to, $subject, $message);
+  }
+
+  function send_rejected_notification()
+  {
+    if ($this->is_test()) return;
+
+    $advisorId = $this->User_ctx_model->advisorId();
+    $query = $this->db->get_where('people', array('id' => $advisorId), 1);
+    $result = $query->result();
+    $result = $result[0];
+
+    $to = '';
+    $to = $to . $result->email_acct . '@' . $result->email_host;
+    $to = $to . ', ' . $this->User_ctx_model->email_address;
+    $to = $to . ', advisor@cs.stanford.edu';
+
+    $studentName = $this->User_ctx_model->fullName();
+    $subject = 'Advisor ' . $result->nam_last . ' has REJECTED your MSCS waiver request (eom)';
+
+    // In case any of our lines are larger than 70 characters, we should use wordwrap()
+    $message = wordwrap('', 70, "\r\n");
+
     // Send
     mail($to, $subject, $message);
   }

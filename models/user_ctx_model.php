@@ -19,6 +19,8 @@ class User_ctx_model extends CI_Model {
         #$csid = 'nicole';
         #$csid = 'roycecy';
         #$csid = 'coopers';
+        #$csid = 'crknight';
+        #$csid = 'mrg';
 
         $this->csid = $csid;
         
@@ -35,7 +37,7 @@ class User_ctx_model extends CI_Model {
         $this->id = intval($result->id);
         $this->first_name = $result->nam_friendly;
         $this->last_name = $result->nam_last;
-        $this->email_address = $result->email_acct . '@' . $result->email_host;
+        $this->email_address = $result->primary_csalias . '@cs.stanford.edu';
 
         $this->role = $this->_getRole($this->id);
     }
@@ -51,7 +53,8 @@ class User_ctx_model extends CI_Model {
       $result = array(
           'id' => $this->id,
           'first_name' => $this->first_name,
-          'last_name' => $this->last_name
+          'last_name' => $this->last_name,
+          'csid' => $this->csid
       );
 
       if (!is_null($this->role))
