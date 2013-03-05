@@ -21,6 +21,7 @@ class User_ctx_model extends CI_Model {
         #$csid = 'coopers';
         #$csid = 'crknight';
         #$csid = 'mrg';
+        #$csid = 'plotkin';
 
         $this->csid = $csid;
         
