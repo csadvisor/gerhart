@@ -226,7 +226,7 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = $result->email_acct . '@' . $result->email_host;
+    $to = $result->primary_csalias . '@cs.stanford.edu';
     $to = $to . ', ' . $this->User_ctx_model->email_address;
     $to = $to . ', advisor@cs.stanford.edu';
 
@@ -239,7 +239,7 @@ class Petition_model extends CI_Model {
     $m = $m . "\r\n\r\n";
     $m = $m . "Your advisee, " . $studentName . ", just created a petition. ";
     $m = $m . "\"Approve\" or \"Decline\" their request here, ";
-    $m = $m . "http://j.mp/cs_petitions. If you want to talk with your advisee";
+    $m = $m . "http://j.mp/cs_petitions. If you want to talk with your advisee ";
     $m = $m . "in person before making a decision then \"Reply All\" to this ";
     $m = $m . "email and tell them your availability.";
     $m = $m . "\r\n\r\n";
@@ -264,7 +264,7 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = $result->email_acct . '@' . $result->email_host;
+    $to = $result->primary_csalias . '@cs.stanford.edu';
     $to = $to . ', ' . $this->User_ctx_model->email_address;
     $to = $to . ', advisor@cs.stanford.edu';
 
@@ -288,7 +288,7 @@ class Petition_model extends CI_Model {
     $result = $result[0];
 
     $to = '';
-    $to = $to . $result->email_acct . '@' . $result->email_host;
+    $to = $to . $result->primary_csalias . '@cs.stanford.edu';
     $to = $to . ', ' . $this->User_ctx_model->email_address;
     $to = $to . ', advisor@cs.stanford.edu';
 
