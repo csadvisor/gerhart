@@ -16,9 +16,10 @@ class Petition_model extends CI_Model {
     'transfer_syllabus',
     'transfer_textbooks',
     'course_number',
-    'created_on',
-    'last_modified',
     'transcript',
+    'created_on', # HACK using this field for date_approved
+    'date_approved',
+    'last_modified',
   );
 
   var $_attributes = array();
@@ -104,14 +105,24 @@ class Petition_model extends CI_Model {
     return $this->_attributes;
   }
 
+  function tstamp()
+  {
+    return date('Y-m-d G:i:s');
+  }
+
   function create()
   {
     $errors = $this->validate();
     if (!empty($errors))
       return $errors;
 
+    # HACK using this field for approved date
+    #$this->_set('created_on', $this->tstamp());
+    $this->_set('last_modified', $this->tstamp());
+
     $this->db->insert($this->TABLE_NAME, $this->attributes());
     # TODO: retrieve record and send back ctime, mtime
+
     $this->_set('id', $this->db->insert_id());
     
   }
@@ -125,6 +136,8 @@ class Petition_model extends CI_Model {
 
     if (!empty($errors))
       return $errors;
+
+    $this->_set('last_modified', $this->tstamp());
 
     $criteria = $this->User_ctx_model->addRoleFKey(array('id' => $this->_get('id')));
     $this->db->where('id', $this->_get('id'));
@@ -214,6 +227,8 @@ class Petition_model extends CI_Model {
             if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
               return $this->valError('Only admins can mark a petition as processed');
 
+            # HACK this should be it's own field
+            $this->_set('created_on', $this->tstamp());
             $this->send_approved_notification();
 
             break;
@@ -289,10 +304,12 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = $result->primary_csalias . '@cs.stanford.edu';     # notify advisor
+    $to = '';
+    $to = $to . 'stager@cs.stanford.edu';                    # notify Claire Stager
     $to = $to . ', ' . $this->User_ctx_model->email_address; # notify student
     $to = $to . ', advisor@cs.stanford.edu';                 # notify course advisor
-    $to = $to . ', stager@cs.stanford.edu';                  # notify Claire Stager
+    # This is a lot of emails for advisors to get
+    # $to = $to . ', ', . $result->primary_csalias . '@cs.stanford.edu';     # notify advisor
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Advisor ' . $result->nam_last . ' has APPROVED your MSCS waiver request (eom)';
@@ -314,9 +331,11 @@ class Petition_model extends CI_Model {
     $result = $result[0];
 
     $to = '';
-    $to = $to . $result->primary_csalias . '@cs.stanford.edu';
-    $to = $to . ', ' . $this->User_ctx_model->email_address;
-    $to = $to . ', advisor@cs.stanford.edu';
+    $to = $to . $this->User_ctx_model->email_address; # notify student
+    $to = $to . ', advisor@cs.stanford.edu'; # notify course advisor
+
+    # too many emails to advisor
+    #$to = $to . ', ' . $result->primary_csalias . '@cs.stanford.edu'; # notify advisor
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Advisor ' . $result->nam_last . ' has REJECTED your MSCS waiver request (eom)';
