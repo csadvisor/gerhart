@@ -15,6 +15,12 @@ class App extends CI_Controller {
     $this->send($this->User_ctx_model->get());
   }
 
+  public function notify()
+  {
+    $this->Petition_model->send_created_notification();
+    echo 'Success';
+  }
+
 	public function petitions($id = null)
 	{
     switch ($_SERVER['REQUEST_METHOD'])

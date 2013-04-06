@@ -89,7 +89,6 @@ class Petition_model extends CI_Model {
     # TODO: retrieve record and send back ctime, mtime
     $this->_set('id', $this->db->insert_id());
     
-    $this->send_created_notification();
   }
 
   function update()
@@ -226,7 +225,8 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = $result->primary_csalias . '@cs.stanford.edu';
+    $to = '';
+    $to = $to . $result->primary_csalias . '@cs.stanford.edu';
     $to = $to . ', ' . $this->User_ctx_model->email_address;
     $to = $to . ', advisor@cs.stanford.edu';
 
