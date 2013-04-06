@@ -43,6 +43,27 @@ class Petition_model extends CI_Model {
     return $query->result();
   }
 
+  function test()
+  {
+    # SELECT t.PhoneNumber1, t.PhoneNumber2, 
+    #      t2.SomeOtherFieldForPhone1, t3.someOtherFieldForPhone2
+    #      FROM Table1 t
+    #      JOIN Table2 t1 ON t1.PhoneNumber = t.PhoneNumber1
+    #      JOIN Table2 t2 ON t2.PhoneNumber = t.PhoneNumber2
+
+    $a_fields = 't1.nam_last as a_last, t1.nam_friendly as a_first, t1.primary_csalias as a_alias'; 
+    $s_fields = 't2.nam_last as s_last, t2.nam_friendly as s_first, t2.primary_csalias as s_alias'; 
+    $this->db->select('t.*, ' . $a_fields . ', ' . $s_fields); 
+    $this->db->join('people t1', 't1.id = t.student_id'); 
+    $this->db->join('people t2', 't2.id = t.advisor_id'); 
+    
+    # select records relevant to user 
+    $criteria = $this->User_ctx_model->addRoleFKey(array()); 
+    $query = $this->db->get_where($this->TABLE_NAME . ' t', $criteria); 
+    
+    return $query->result(); 
+  }
+
   /*
    * find
    */
@@ -264,9 +285,10 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = $result->primary_csalias . '@cs.stanford.edu';
-    $to = $to . ', ' . $this->User_ctx_model->email_address;
-    $to = $to . ', advisor@cs.stanford.edu';
+    $to = $result->primary_csalias . '@cs.stanford.edu';     # notify advisor
+    $to = $to . ', ' . $this->User_ctx_model->email_address; # notify student
+    $to = $to . ', advisor@cs.stanford.edu';                 # notify course advisor
+    $to = $to . ', stager@cs.stanford.edu';                  # notify Claire Stager
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Advisor ' . $result->nam_last . ' has APPROVED your MSCS waiver request (eom)';
