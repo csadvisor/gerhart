@@ -35,23 +35,14 @@ class Petition_model extends CI_Model {
    */
   function all()
   {
-    $peopleFields = 'people.nam_last, people.nam_friendly, people.primary_csalias';
-    $criteria = $this->User_ctx_model->addRoleFKey(array());
-    $this->db->select($this->TABLE_NAME . '.*, ' . $peopleFields);
-    $this->db->join('people', 'people.id = petitions.student_id');
-    $query = $this->db->get_where($this->TABLE_NAME, $criteria);
-
-    return $query->result();
-  }
-
-  function test()
-  {
+    # double join example:
+    #
     # SELECT t.PhoneNumber1, t.PhoneNumber2, 
     #      t2.SomeOtherFieldForPhone1, t3.someOtherFieldForPhone2
     #      FROM Table1 t
     #      JOIN Table2 t1 ON t1.PhoneNumber = t.PhoneNumber1
     #      JOIN Table2 t2 ON t2.PhoneNumber = t.PhoneNumber2
-
+    
     $s_fields = 't1.nam_last as s_last, t1.nam_friendly as s_first, t1.primary_csalias as s_alias'; 
     $a_fields = 't2.nam_last as a_last, t2.nam_friendly as a_first, t2.primary_csalias as a_alias'; 
     $this->db->select('t.*, ' . $a_fields . ', ' . $s_fields); 
@@ -62,9 +53,8 @@ class Petition_model extends CI_Model {
     $this->db->order_by('s_last');
     
     # select records relevant to user 
-    #$criteria = $this->User_ctx_model->addRoleFKey(array()); 
-    #$query = $this->db->get_where($this->TABLE_NAME . ' t', $criteria); 
-    $query = $this->db->get($this->TABLE_NAME . ' t'); 
+    $criteria = $this->User_ctx_model->addRoleFKey(array()); 
+    $query = $this->db->get_where($this->TABLE_NAME . ' t', $criteria); 
     
     return $query->result(); 
   }
