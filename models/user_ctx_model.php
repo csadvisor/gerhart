@@ -11,6 +11,8 @@ class User_ctx_model extends CI_Model {
         # Testing with using other peoples CSIDs
         #
         
+        #$csid = 'mcumings';
+        #$csid = 'federico.barbagli';
         #$csid = 'monica.lam'; # my advisor
         #$csid = 'dan.boneh'; # another advisor
         #$csid = 'twangcat'; # another MSCS student
@@ -129,6 +131,11 @@ class User_ctx_model extends CI_Model {
 
     private function _getRole($id)
     {
+      // special cases
+      if ($id == 11354) { // federico.barbagli@cs.stanford.edu
+        return 'advisor';
+      }
+
         $query = $this->db->get_where('people_relations', array('person_id' => $id));
         $result = $query->result();
 
