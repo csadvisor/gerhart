@@ -298,10 +298,10 @@ class Petition_model extends CI_Model {
 
     $to = '';
     $to = $to . 'stager@cs.stanford.edu';                    # notify Claire Stager
-    $to = $to . ', ' . $this->User_ctx_model->email_address; # notify student
+    $to = $to . ', ' . $result->primary_csalias . '@cs.stanford.edu';     # notify advisor
     $to = $to . ', advisor@cs.stanford.edu';                 # notify course advisor
     # This is a lot of emails for advisors to get
-    # $to = $to . ', ', . $result->primary_csalias . '@cs.stanford.edu';     # notify advisor
+    # $to = $to . ', ' . $this->User_ctx_model->email_address; # notify student
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Advisor ' . $result->nam_last . ' has APPROVED your MSCS waiver request (eom)';
