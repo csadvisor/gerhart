@@ -135,6 +135,10 @@ class User_ctx_model extends CI_Model {
       if ($id == 11354) { // federico.barbagli@cs.stanford.edu
         return 'advisor';
       }
+      if ($id == 13725) { // Jack Dubie
+        return 'admin';
+      }
+      // TODO for future Course Advisor add yourself here
 
         $query = $this->db->get_where('people_relations', array('person_id' => $id));
         $result = $query->result();
