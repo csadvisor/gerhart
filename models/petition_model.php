@@ -198,9 +198,9 @@ class Petition_model extends CI_Model {
   function valError($reason)
   {
     return array(
-      'statusCode' => 403,
-      'error' => 'Forbidden',
-      'reason' => $reason
+      'statusCode'  => 403,
+      'error'       => 'Forbidden',
+      'reason'      => $reason
     );
   }
 
@@ -209,9 +209,9 @@ class Petition_model extends CI_Model {
 
     $curState = $this->_get('state');
 
-    #
-    # create
-    #
+    /*
+     * create
+     */
 
     if (empty($oldDoc))
       {
@@ -227,9 +227,9 @@ class Petition_model extends CI_Model {
         return;
       }
 
-    #
-    # update
-    #
+    /*
+     * update
+     */
 
     else
       {
@@ -288,33 +288,38 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = '';
-    $to = $to . $result->primary_csalias . '@cs.stanford.edu';
-    $to = $to . ', ' . $this->User_ctx_model->email_address;
-    $to = $to . ', advisor@cs.stanford.edu';
+    $to = implode(', ', array(
+      $result->primary_csalias . '@cs.stanford.edu',
+      $this->User_ctx_model->email_address,
+      'advisor@cs.stanford.edu',
+    ));
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Your advisee, ' . $studentName . ', just created an MSCS waiver request';
 
-    // The message
-    $m = '';
-    $m = $m . "Advisor " . $result->nam_last . ",";
-    $m = $m . "\r\n\r\n";
-    $m = $m . "Your advisee, " . $studentName . ", just created a petition. ";
-    $m = $m . "\"Approve\" or \"Decline\" their request here, ";
-    $m = $m . "http://j.mp/cs_petitions. If you want to talk with your advisee ";
-    $m = $m . "in person before making a decision then \"Reply All\" to this ";
-    $m = $m . "email and tell them your availability.";
-    $m = $m . "\r\n\r\n";
-    $m = $m . "Sincerely,\r\n";
-    $m = $m . "MSCS Petitions Robot\r\n";
-    $m = $m . "\r\n";
-    $m = $m . "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n";
-
-    // In case any of our lines are larger than 70 characters, we should use wordwrap()
-    $message = wordwrap($m, 70, "\r\n");
+    /*
+     * Create message and word wrap to 70 characters per line
+     */
+    $message = implode('', array(
+      "Advisor " . $result->nam_last . ",",
+      "\r\n\r\n",
+      "Your advisee, " . $studentName . ", just created a petition. ",
+      "\"Approve\" or \"Decline\" their request here, ",
+      "http://j.mp/cs_petitions. If you want to talk with your advisee ",
+      "in person before making a decision then \"Reply All\" to this ",
+      "email and tell them your availability.",
+      "\r\n\r\n",
+      "Sincerely,\r\n",
+      "MSCS Petitions Robot\r\n",
+      "\r\n",
+      "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n",
+    ));
+    $message = wordwrap($message, 70, "\r\n");
    
-    // Send
+    /*
+     * Actually send email.
+     * TODO: sends as current linux user `apache` - could be better
+     */
     mail($to, $subject, $message);
   }
 
@@ -327,17 +332,20 @@ class Petition_model extends CI_Model {
     $result = $query->result();
     $result = $result[0];
 
-    $to = '';
-    $to = $to . 'stager@cs.stanford.edu';                    # notify Claire Stager
-    $to = $to . ', ' . $result->primary_csalias . '@cs.stanford.edu';     # notify advisor
-    $to = $to . ', advisor@cs.stanford.edu';                 # notify course advisor
-    # This is a lot of emails for advisors to get
-    # $to = $to . ', ' . $this->User_ctx_model->email_address; # notify student
+    $to = implode(', ', array(
+      'stager@cs.stanford.edu',                      # Claire Stager
+      $result->primary_csalias . '@cs.stanford.edu', # student
+      'advisor@cs.stanford.edu',                     # course advisor
+      # This is a lot of emails for advisors to get
+      # $this->User_ctx_model->email_address; # notify advisor
+    ));
 
     $studentName = $this->User_ctx_model->fullName();
     $subject = 'Advisor ' . $result->nam_last . ' has APPROVED your MSCS waiver request (eom)';
     
-    // In case any of our lines are larger than 70 characters, we should use wordwrap()
+    /*
+     * Word wrap
+     */
     $message = wordwrap('', 70, "\r\n");
 
     // Send
@@ -346,27 +354,111 @@ class Petition_model extends CI_Model {
 
   function send_rejected_notification()
   {
-    if ($this->is_test()) return;
 
-    $advisorId = $this->User_ctx_model->advisorId();
-    $query = $this->db->get_where('people', array('id' => $advisorId), 1);
-    $result = $query->result();
-    $result = $result[0];
+    #$advisorId = $this->User_ctx_model->advisorId();
+    #$query = $this->db->get_where('people', array('id' => $advisorId), 1);
+    #$result = $query->result();
+    #$result = $result[0];
 
-    $to = '';
-    $to = $to . $this->User_ctx_model->email_address; # notify student
-    $to = $to . ', advisor@cs.stanford.edu'; # notify course advisor
-
+    #$to = '';
+    #$to = $to . $this->User_ctx_model->email_address; # notify student
+    #$to = $to . ', advisor@cs.stanford.edu'; # notify course advisor
     # too many emails to advisor
     #$to = $to . ', ' . $result->primary_csalias . '@cs.stanford.edu'; # notify advisor
+    
+    $roles = array('advisee');
+    $subject = 'Your MSCS waiver request has been rejected';
+    $body = array(
+      'Dear student,',
+      "\r\n\r\n",
+      'If you feel there was a mistake email your advisor',
 
-    $studentName = $this->User_ctx_model->fullName();
-    $subject = 'Advisor ' . $result->nam_last . ' has REJECTED your MSCS waiver request (eom)';
+    );
+    $this->send_notification($roles, $subject, $body);
+
 
     // In case any of our lines are larger than 70 characters, we should use wordwrap()
     $message = wordwrap('', 70, "\r\n");
 
     // Send
+    mail($to, $subject, $message);
+  }
+
+  /*
+   * getAdviseeEmail
+   */
+  function getAdviseeEmail()
+  {
+    switch ($this->User_ctx_model->role) {
+      case 'advisor':
+      case 'advisee':
+        return $this->User_ctx_model->email_address;
+      case 'admin':
+        throw new Exception('Admin does not have scope of an advisor');
+        break;
+    }
+    throw new Exception('Unrecognized role');
+  }
+
+  /*
+   * getAdvisorEmail
+   */
+  function getAdvisorEmail()
+  {
+    switch ($this->User_ctx_model->role) {
+      case 'advisor':
+        return $this->User_ctx_model->email_address;
+      case 'advisee':
+        $advisorId = $this->User_ctx_model->advisorId();
+        $query = $this->db->get_where('people', array('id' => $advisorId), 1);
+        $result = $query->result();
+        $result = $result[0];
+        return $result->primary_csalias . '@cs.stanford.edu';
+      case 'admin':
+        throw new Exception('Admin does not have scope of an advisor');
+        break;
+    }
+    throw new Exception('Unrecognized role');
+  }
+
+  function send_notification($roles, $subject, $body)
+  {
+    if ($this->is_test()) return;
+
+    /*
+     * Fill to array
+     */
+    $to = array('petitions@cs.stanford.edu');
+    foreach ($roles as $role) {
+      switch ($role) {
+        case 'admin':
+          array_push($to, 'stager@cs.stanford.edu');
+          break;
+        case 'advisee':
+          array_push($to, $this->getAdviseeEmail());
+          break;
+        case 'advisor':
+          array_push($to, $this->getAdvisorEmail());
+          break;
+      }
+    }
+
+    /*
+     * Add footer and word wrap message
+     */
+    $footer = array(
+      "\r\n\r\n",
+      "Sincerely,\r\n",
+      "MSCS Petitions Robot\r\n",
+      "\r\n",
+      "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n",
+    );
+    $message = wordwrap(array_merge($body, $footer), 70, "\r\n");
+   
+    /*
+     * Actually send email.
+     * TODO: sends as current linux user `apache` - could be better
+     */
     mail($to, $subject, $message);
   }
 

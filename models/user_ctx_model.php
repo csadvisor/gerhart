@@ -120,6 +120,10 @@ class User_ctx_model extends CI_Model {
       return $criteria;
     }
 
+    function adviseeId()
+    {
+    }
+
     function advisorId()
     {
       if ($this->role() != 'advisee') return null;
