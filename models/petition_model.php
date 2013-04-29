@@ -1,4 +1,6 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Petition_model extends CI_Model {
 
@@ -26,8 +28,10 @@ class Petition_model extends CI_Model {
 
   function __construct()
   {
+    if (isset($_ENV["TEST"])) {
       $this->load->model('User_ctx_model', '', TRUE);
       parent::__construct();
+    }
   }
   
   /*
@@ -374,8 +378,7 @@ class Petition_model extends CI_Model {
       'If you feel there was a mistake email your advisor',
 
     );
-    $this->send_notification($roles, $subject, $body);
-
+    $this->sendNotification($roles, $subject, $body);
 
     // In case any of our lines are larger than 70 characters, we should use wordwrap()
     $message = wordwrap('', 70, "\r\n");
@@ -421,7 +424,7 @@ class Petition_model extends CI_Model {
     throw new Exception('Unrecognized role');
   }
 
-  function send_notification($roles, $subject, $body)
+  function sendNotification($roles, $subject, $body)
   {
     if ($this->is_test()) return;
 
@@ -442,6 +445,7 @@ class Petition_model extends CI_Model {
           break;
       }
     }
+    $to = implode(', ', $to); // join array on ', '
 
     /*
      * Add footer and word wrap message
@@ -459,7 +463,20 @@ class Petition_model extends CI_Model {
      * Actually send email.
      * TODO: sends as current linux user `apache` - could be better
      */
-    mail($to, $subject, $message);
+    $this->sendEmail($to, $subject, $message);
   }
 
+  /**
+   * sendEmail
+   */
+  function sendEmail($to, $subject, $message)
+  {
+    if (getenv('TEST') == 'localtest') {
+      echo "TO: $to\n";
+      echo "SUBJECT: $to\n";
+      echo "MESSAGE:\n$message\n";
+    } else {
+      send($to, $subject, $message);
+    }
+  }
 }

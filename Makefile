@@ -1,4 +1,7 @@
+test:
+	@TEST=localtest bash test.sh
+
 vim:
 	vim -o controllers models
 
-.PHONY: vim
+.PHONY: test vim
