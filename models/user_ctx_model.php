@@ -124,6 +124,44 @@ class User_ctx_model extends CI_Model {
     {
     }
 
+  function emailForId($id)
+  {
+    // TODO: handle case where primary_csalias isn't set
+    $query = $this->db->get_where('people', array('id' => $id), 1);
+    $result = $query->result();
+    $result = $result[0];
+    $email = $result->primary_csalias . '@cs.stanford.edu';
+    return $email;
+  }
+
+  function parseEmail($field, $query)
+  {
+    return $this->emailForId($query[$field]);
+  }
+
+  /*
+   *  getEmails
+   *  This should only be called by advisee or advisor to send notifications
+   */
+  function getEmails()
+  {
+    if ($this->role() != 'advisee' || $this->role() != 'advisor') return null;
+
+    $query = $this->db->get_where('petitions', array(
+      'advisor_id' => $this->id(),
+      'student_id' => $this->id(), 
+    ), 1);
+    $petition = $query->result();
+
+    return array(
+      'advisor_email' => $this->parseEmail('advisor_id', $petition),
+      'adviee_email'  => $this->parseEmail('student_id', $petition),
+    );
+
+    return intval($result[0]->advisor_id);
+  }
+
+
     function advisorId()
     {
       if ($this->role() != 'advisee') return null;
@@ -139,9 +177,9 @@ class User_ctx_model extends CI_Model {
       if ($id == 11354) { // federico.barbagli@cs.stanford.edu
         return 'advisor';
       }
-      if ($id == 13725) { // Jack Dubie
-        return 'admin';
-      }
+      //if ($id == 13725) { // Jack Dubie
+      //  return 'admin';
+      //}
       // TODO for future Course Advisor add yourself here
 
         $query = $this->db->get_where('people_relations', array('person_id' => $id));

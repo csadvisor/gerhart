@@ -344,6 +344,15 @@ class Petition_model extends CI_Model {
     throw new Exception('Unrecognized role');
   }
 
+  function emailForId($id)
+  {
+    $query = $this->db->get_where('people', array('id' => $id), 1);
+    $result = $query->result();
+    $result = $result[0];
+    $email = $result->primary_csalias . '@cs.stanford.edu';
+    return $email;
+  }
+
   /*
    * getAdvisorEmail
    */
@@ -355,11 +364,12 @@ class Petition_model extends CI_Model {
       case 'advisor':
         return $this->User_ctx_model->email_address;
       case 'advisee':
-        $advisorId = $this->User_ctx_model->advisorId();
-        $query = $this->db->get_where('people', array('id' => $advisorId), 1);
+        $query = $this->db->get_where('people', array('id' => $this->student_id), 1);
         $result = $query->result();
         $result = $result[0];
-        return $result->primary_csalias . '@cs.stanford.edu';
+        $email = $result->primary_csalias . '@cs.stanford.edu';
+        echo "advisee email: $name";
+        return $email;
       case 'admin':
         throw new Exception('Admin does not have scope of an advisor');
         break;
@@ -373,16 +383,17 @@ class Petition_model extends CI_Model {
      * Fill to array
      */
     $to = array('petitions@cs.stanford.edu');
+    $emails = $this->User_ctx_model->getEmails();
     foreach ($roles as $role) {
       switch ($role) {
         case 'admin':
           array_push($to, 'stager@cs.stanford.edu');
           break;
         case 'advisee':
-          array_push($to, $this->getAdviseeEmail());
+          array_push($to, $emails->advisee_email);
           break;
         case 'advisor':
-          array_push($to, $this->getAdvisorEmail());
+          array_push($to, $emails->advisor_email);
           break;
       }
     }
@@ -419,7 +430,8 @@ class Petition_model extends CI_Model {
       echo "SUBJECT: $subject\n";
       echo "MESSAGE:\n$message\n";
     } else {
-      send($to, $subject, $message);
+      //mail($to, $subject, $message);
+      echo "TO: $to\n";
     }
   }
 }
