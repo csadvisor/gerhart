@@ -28,7 +28,10 @@ class Petition_model extends CI_Model {
 
   function __construct()
   {
-    if (isset($_ENV["TEST"])) {
+    /* set isTest */
+    $this->isTest = getenv('TEST') == 'localtest';
+
+    if (!$this->isTest) {
       $this->load->model('User_ctx_model', '', TRUE);
       parent::__construct();
     }
@@ -392,6 +395,8 @@ class Petition_model extends CI_Model {
    */
   function getAdviseeEmail()
   {
+    if ($this->isTest) return 'advisee@cs.stanford.edu';
+
     switch ($this->User_ctx_model->role) {
       case 'advisor':
       case 'advisee':
@@ -408,6 +413,8 @@ class Petition_model extends CI_Model {
    */
   function getAdvisorEmail()
   {
+    if ($this->isTest) return 'advisor@cs.stanford.edu';
+
     switch ($this->User_ctx_model->role) {
       case 'advisor':
         return $this->User_ctx_model->email_address;
@@ -426,9 +433,7 @@ class Petition_model extends CI_Model {
 
   function sendNotification($roles, $subject, $body)
   {
-    if ($this->is_test()) return;
-
-    /*
+    /**
      * Fill to array
      */
     $to = array('petitions@cs.stanford.edu');
@@ -451,13 +456,15 @@ class Petition_model extends CI_Model {
      * Add footer and word wrap message
      */
     $footer = array(
-      "\r\n\r\n",
-      "Sincerely,\r\n",
-      "MSCS Petitions Robot\r\n",
-      "\r\n",
-      "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n",
+      "",
+      "Sincerely,",
+      "MSCS Petitions Robot",
+      "",
+      "Questions, bugs, or feedback? Email petitions@cs.stanford.edu",
     );
-    $message = wordwrap(array_merge($body, $footer), 70, "\r\n");
+    $body = array_merge($body, $footer);
+    $body = implode("\r\n", $body);
+    $message = wordwrap($body, 70, "\r\n");
    
     /*
      * Actually send email.
@@ -471,9 +478,9 @@ class Petition_model extends CI_Model {
    */
   function sendEmail($to, $subject, $message)
   {
-    if (getenv('TEST') == 'localtest') {
+    if ($this->isTest) {
       echo "TO: $to\n";
-      echo "SUBJECT: $to\n";
+      echo "SUBJECT: $subject\n";
       echo "MESSAGE:\n$message\n";
     } else {
       send($to, $subject, $message);

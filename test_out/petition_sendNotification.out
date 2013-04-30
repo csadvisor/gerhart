@@ -1,0 +1,17 @@
+******** start Petition_model test ********
+TO: petitions@cs.stanford.edu, stager@cs.stanford.edu, advisee@cs.stanford.edu, advisor@cs.stanford.edu
+SUBJECT: subject-test
+MESSAGE:
+Dear student,
+
+We have seen some conerning
+Stuff
+Yea you should figure it out
+Super long line this should get word wrapped cause its really really
+really really really long
+
+Sincerely,
+MSCS Petitions Robot
+
+Questions, bugs, or feedback? Email petitions@cs.stanford.edu
+******** end Petition_model test ********
