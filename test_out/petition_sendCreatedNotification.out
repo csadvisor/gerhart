@@ -1,0 +1,16 @@
+******** start Petition_model test ********
+TO: petitions@cs.stanford.edu, advisor@cs.stanford.edu, advisee@cs.stanford.edu
+SUBJECT: Your advisee just created an MSCS waiver request
+MESSAGE:
+Dear Advisor,
+
+Your advisee just created a petition. "Approve" or "Decline" their
+request here, http://j.mp/cs_petitions. If you want to talk with your
+advisee in person before making a decision then "Reply All" to this
+email and tell them your availability.
+
+Sincerely,
+MSCS Petitions Robot
+
+Questions, bugs, or feedback? Email petitions@cs.stanford.edu
+******** end Petition_model test ********

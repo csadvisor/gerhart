@@ -259,7 +259,7 @@ class Petition_model extends CI_Model {
 
             # HACK this should be it's own field
             $this->_set('created_on', $this->tstamp());
-            $this->send_approved_notification();
+            $this->sendApprovedNotification();
 
             break;
           case 'rejected':
@@ -281,82 +281,35 @@ class Petition_model extends CI_Model {
       }
   }
 
-  function is_test()
-  {
-    if ($this->User_ctx_model->csid() == 'jdubie') return true;
-    return false;
+  function sendCreatedNotification() {
+    $subject = 'Your advisee just created an MSCS waiver request';
+    $roles = array('advisor', 'advisee');
+    $message = array(
+      'Dear Advisor,',
+      '',
+      'Your advisee just created a petition. '
+      . '"Approve" or "Decline" their request here,'
+      . ' http://j.mp/cs_petitions. If you want to talk with your advisee'
+      . ' in person before making a decision then "Reply All" to this'
+      . ' email and tell them your availability.'
+    );
+
+    $this->sendNotification($roles, $subject, $message);
   }
 
-  function send_created_notification() {
-    if ($this->is_test()) return;
-
-    $advisorId = $this->User_ctx_model->advisorId();
-    $query = $this->db->get_where('people', array('id' => $advisorId), 1);
-    $result = $query->result();
-    $result = $result[0];
-
-    $to = implode(', ', array(
-      $result->primary_csalias . '@cs.stanford.edu',
-      $this->User_ctx_model->email_address,
-      'advisor@cs.stanford.edu',
-    ));
-
-    $studentName = $this->User_ctx_model->fullName();
-    $subject = 'Your advisee, ' . $studentName . ', just created an MSCS waiver request';
-
-    /*
-     * Create message and word wrap to 70 characters per line
-     */
-    $message = implode('', array(
-      "Advisor " . $result->nam_last . ",",
-      "\r\n\r\n",
-      "Your advisee, " . $studentName . ", just created a petition. ",
-      "\"Approve\" or \"Decline\" their request here, ",
-      "http://j.mp/cs_petitions. If you want to talk with your advisee ",
-      "in person before making a decision then \"Reply All\" to this ",
-      "email and tell them your availability.",
-      "\r\n\r\n",
-      "Sincerely,\r\n",
-      "MSCS Petitions Robot\r\n",
-      "\r\n",
-      "Questions, bugs, or feedback? Email petitions@cs.stanford.edu\r\n",
-    ));
-    $message = wordwrap($message, 70, "\r\n");
-   
-    /*
-     * Actually send email.
-     * TODO: sends as current linux user `apache` - could be better
-     */
-    mail($to, $subject, $message);
-  }
-
-  function send_approved_notification()
+  function sendApprovedNotification()
   {
-    if ($this->is_test()) return;
+    $roles = array('admin', 'advisee');
+    $subject = 'Advisor has approved your MSCS waiver request';
+    $message = array(
+      'Dear Student,',
+      '',
+      'Your advisor has approved your MSCS waiver request. Claire Stager'
+      . ' (stager@cs.stanford.edu) will print out your waiver and keep it on'
+      . ' file until you graduate.'
+    );
 
-    $advisorId = $this->User_ctx_model->advisorId();
-    $query = $this->db->get_where('people', array('id' => $advisorId), 1);
-    $result = $query->result();
-    $result = $result[0];
-
-    $to = implode(', ', array(
-      'stager@cs.stanford.edu',                      # Claire Stager
-      $result->primary_csalias . '@cs.stanford.edu', # student
-      'advisor@cs.stanford.edu',                     # course advisor
-      # This is a lot of emails for advisors to get
-      # $this->User_ctx_model->email_address; # notify advisor
-    ));
-
-    $studentName = $this->User_ctx_model->fullName();
-    $subject = 'Advisor ' . $result->nam_last . ' has APPROVED your MSCS waiver request (eom)';
-    
-    /*
-     * Word wrap
-     */
-    $message = wordwrap('', 70, "\r\n");
-
-    // Send
-    mail($to, $subject, $message);
+    $this->sendNotification($roles, $subject, $message);
   }
 
   function sendRejectedNotification()

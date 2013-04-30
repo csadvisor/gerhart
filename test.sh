@@ -3,7 +3,9 @@
 fcns=(
   'sendEmail'
   'sendNotification'
+  'sendApprovedNotification'
   'sendRejectedNotification'
+  'sendCreatedNotification'
   )
 
 for fcn in "${fcns[@]}"

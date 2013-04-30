@@ -17,7 +17,7 @@ class App extends CI_Controller {
 
   public function notify()
   {
-    $this->Petition_model->send_created_notification();
+    $this->Petition_model->sendCreatedNotification();
     echo 'Success';
   }
 

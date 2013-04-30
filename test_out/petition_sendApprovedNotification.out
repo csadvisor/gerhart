@@ -1,0 +1,15 @@
+******** start Petition_model test ********
+TO: petitions@cs.stanford.edu, stager@cs.stanford.edu, advisee@cs.stanford.edu
+SUBJECT: Advisor has approved your MSCS waiver request
+MESSAGE:
+Dear Student,
+
+Your advisor has approved your MSCS waiver request. Claire Stager
+(stager@cs.stanford.edu) will print out your waiver and keep it on
+file until you graduate.
+
+Sincerely,
+MSCS Petitions Robot
+
+Questions, bugs, or feedback? Email petitions@cs.stanford.edu
+******** end Petition_model test ********
