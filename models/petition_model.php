@@ -31,10 +31,11 @@ class Petition_model extends CI_Model {
     /* set isTest */
     $this->isTest = getenv('TEST') == 'localtest';
 
-    if (!$this->isTest) {
-      $this->load->model('User_ctx_model', '', TRUE);
-      parent::__construct();
-    }
+    if (!$this->isTest)
+      {
+        $this->load->model('User_ctx_model', '', TRUE);
+        parent::__construct();
+      }
   }
   
   /*
@@ -326,24 +327,6 @@ class Petition_model extends CI_Model {
     $this->sendNotification($roles, $subject, $body);
   }
 
-  /*
-   * getAdviseeEmail
-   */
-  function getAdviseeEmail()
-  {
-    if ($this->isTest) return 'advisee@cs.stanford.edu';
-
-    switch ($this->User_ctx_model->role) {
-      case 'advisor':
-      case 'advisee':
-        return $this->User_ctx_model->email_address;
-      case 'admin':
-        throw new Exception('Admin does not have scope of an advisor');
-        break;
-    }
-    throw new Exception('Unrecognized role');
-  }
-
   function emailForId($id)
   {
     $query = $this->db->get_where('people', array('id' => $id), 1);
@@ -353,28 +336,19 @@ class Petition_model extends CI_Model {
     return $email;
   }
 
-  /*
-   * getAdvisorEmail
-   */
-  function getAdvisorEmail()
+  function getEmails()
   {
-    if ($this->isTest) return 'advisor@cs.stanford.edu';
-
-    switch ($this->User_ctx_model->role) {
-      case 'advisor':
-        return $this->User_ctx_model->email_address;
-      case 'advisee':
-        $query = $this->db->get_where('people', array('id' => $this->student_id), 1);
-        $result = $query->result();
-        $result = $result[0];
-        $email = $result->primary_csalias . '@cs.stanford.edu';
-        echo "advisee email: $name";
-        return $email;
-      case 'admin':
-        throw new Exception('Admin does not have scope of an advisor');
-        break;
-    }
-    throw new Exception('Unrecognized role');
+    if ($this->isTest)
+      {
+        return array(
+          'advisee_email' => 'advisee@cs.stanford.edu',
+          'advisor_email' => 'advisor@cs.stanford.edu',
+        );
+      }
+    else
+      {
+        return $emails = $this->User_ctx_model->getEmails();
+      }
   }
 
   function sendNotification($roles, $subject, $body)
@@ -383,17 +357,17 @@ class Petition_model extends CI_Model {
      * Fill to array
      */
     $to = array('petitions@cs.stanford.edu');
-    $emails = $this->User_ctx_model->getEmails();
+    $emails = $this->getEmails();
     foreach ($roles as $role) {
       switch ($role) {
         case 'admin':
           array_push($to, 'stager@cs.stanford.edu');
           break;
         case 'advisee':
-          array_push($to, $emails->advisee_email);
+          array_push($to, $emails['advisee_email']);
           break;
         case 'advisor':
-          array_push($to, $emails->advisor_email);
+          array_push($to, $emails['advisor_email']);
           break;
       }
     }

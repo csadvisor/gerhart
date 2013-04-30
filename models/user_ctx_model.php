@@ -132,6 +132,9 @@ class User_ctx_model extends CI_Model {
     $result = $result[0];
     $email = $result->primary_csalias . '@cs.stanford.edu';
     return $email;
+
+    // Do we need call to intval?
+    //return intval($result[0]->advisor_id);
   }
 
   function parseEmail($field, $query)
@@ -157,8 +160,6 @@ class User_ctx_model extends CI_Model {
       'advisor_email' => $this->parseEmail('advisor_id', $petition),
       'adviee_email'  => $this->parseEmail('student_id', $petition),
     );
-
-    return intval($result[0]->advisor_id);
   }
 
 
