@@ -1,0 +1,14 @@
+******** start Petition_model test ********
+TO: petitions@cs.stanford.edu, advisee@cs.stanford.edu
+SUBJECT: Your MSCS waiver request has been rejected by your advisor
+MESSAGE:
+Dear student,
+
+Your MSCS waiver has been rejected. If you feel there was a mistake
+email your advisor.
+
+Sincerely,
+MSCS Petitions Robot
+
+Questions, bugs, or feedback? Email petitions@cs.stanford.edu
+******** end Petition_model test ********

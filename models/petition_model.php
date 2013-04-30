@@ -268,7 +268,7 @@ class Petition_model extends CI_Model {
             if ($this->User_ctx_model->role() != 'advisor') # someone else's advisor could do this
               return $this->valError('Only admins can mark a petition as processed');
 
-            $this->send_rejected_notification();
+            $this->sendRejectedNotification();
 
             break;
           case 'processed':
@@ -359,35 +359,18 @@ class Petition_model extends CI_Model {
     mail($to, $subject, $message);
   }
 
-  function send_rejected_notification()
+  function sendRejectedNotification()
   {
-
-    #$advisorId = $this->User_ctx_model->advisorId();
-    #$query = $this->db->get_where('people', array('id' => $advisorId), 1);
-    #$result = $query->result();
-    #$result = $result[0];
-
-    #$to = '';
-    #$to = $to . $this->User_ctx_model->email_address; # notify student
-    #$to = $to . ', advisor@cs.stanford.edu'; # notify course advisor
-    # too many emails to advisor
-    #$to = $to . ', ' . $result->primary_csalias . '@cs.stanford.edu'; # notify advisor
-    
     $roles = array('advisee');
-    $subject = 'Your MSCS waiver request has been rejected';
+    $subject = 'Your MSCS waiver request has been rejected by your advisor';
     $body = array(
       'Dear student,',
-      "\r\n\r\n",
-      'If you feel there was a mistake email your advisor',
-
+      '',
+      'Your MSCS waiver has been rejected. If you feel there was a mistake email'
+      . ' your advisor.',
     );
+
     $this->sendNotification($roles, $subject, $body);
-
-    // In case any of our lines are larger than 70 characters, we should use wordwrap()
-    $message = wordwrap('', 70, "\r\n");
-
-    // Send
-    mail($to, $subject, $message);
   }
 
   /*

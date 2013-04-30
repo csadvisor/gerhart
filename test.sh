@@ -1,6 +1,13 @@
 #!/bin/bash
 
-dif='diff --strip-trailing-cr'
+fcns=(
+  'sendEmail'
+  'sendNotification'
+  'sendRejectedNotification'
+  )
 
-diff --strip-trailing-cr test_out/petition_sendEmail.out <(php test/petition_sendEmail.php)
-diff --strip-trailing-cr test_out/petition_sendNotification.out <(php test/petition_sendNotification.php)
+for fcn in "${fcns[@]}"
+do
+  echo "Testing $fcn"
+  diff --strip-trailing-cr test_out/petition_$fcn.out <(php "test/petition_$fcn.php")
+done
