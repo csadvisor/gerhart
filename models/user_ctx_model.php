@@ -139,7 +139,10 @@ class User_ctx_model extends CI_Model {
 
   function parseEmail($field, $query)
   {
-    return $this->emailForId($query[$field]);
+    if ($field == 'advisor_id')
+      return $this->emailForId($query->advisor_id);
+    if ($field == 'student_id')
+      return $this->emailForId($query->student_id);
   }
 
   /*
@@ -148,17 +151,16 @@ class User_ctx_model extends CI_Model {
    */
   function getEmails()
   {
-    if ($this->role() != 'advisee' || $this->role() != 'advisor') return null;
+    if ($this->role() != 'advisee' && $this->role() != 'advisor') return null;
 
-    $query = $this->db->get_where('petitions', array(
-      'advisor_id' => $this->id(),
-      'student_id' => $this->id(), 
-    ), 1);
-    $petition = $query->result();
+    $this->db->where('advisor_id', $this->id());
+    $this->db->or_where('student_id', $this->id());
+    $petitions = $this->db->get('petitions', 1)->result();
+    $petition = $petitions[0];
 
     return array(
       'advisor_email' => $this->parseEmail('advisor_id', $petition),
-      'adviee_email'  => $this->parseEmail('student_id', $petition),
+      'advisee_email'  => $this->parseEmail('student_id', $petition),
     );
   }
 

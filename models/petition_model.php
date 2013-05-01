@@ -347,7 +347,7 @@ class Petition_model extends CI_Model {
       }
     else
       {
-        return $emails = $this->User_ctx_model->getEmails();
+        return $this->User_ctx_model->getEmails();
       }
   }
 
@@ -404,8 +404,8 @@ class Petition_model extends CI_Model {
       echo "SUBJECT: $subject\n";
       echo "MESSAGE:\n$message\n";
     } else {
-      //mail($to, $subject, $message);
-      echo "TO: $to\n";
+      mail($to, $subject, $message);
+      //echo "TO: $to\n";
     }
   }
 }
