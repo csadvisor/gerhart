@@ -2,102 +2,102 @@
 
 class User_ctx_model extends CI_Model {
 
-    function __construct()
-    {
-        parent::__construct();
-        $csid = getenv("WEBAUTH_USER");
+  function __construct()
+  {
+    parent::__construct();
+    $csid = getenv("WEBAUTH_USER");
 
-        #
-        # Testing with using other peoples CSIDs
-        #
-        
-        #$csid = 'mcumings';
-        #$csid = 'federico.barbagli';
-        #$csid = 'monica.lam'; # my advisor
-        #$csid = 'dan.boneh'; # another advisor
-        #$csid = 'twangcat'; # another MSCS student
-        #$csid = 'stager'; # admin
-        #$csid = 'miles'; # should not be involved
-        #$csid = 'nicole';
-        #$csid = 'roycecy';
-        #$csid = 'coopers';
-        #$csid = 'crknight';
-        #$csid = 'mrg';
-        #$csid = 'plotkin';
+    #
+    # Testing with using other peoples CSIDs
+    #
 
-        $this->csid = $csid;
-        
-        # look up person_id
-        $query = $this->db->get_where('csaliases', array('cs_name' => $csid), 1);
-        $result = $query->result();
-        $result = $result[0];
+    #$csid = 'mcumings';
+    #$csid = 'federico.barbagli';
+    #$csid = 'monica.lam'; # my advisor
+    #$csid = 'dan.boneh'; # another advisor
+    #$csid = 'twangcat'; # another MSCS student
+    #$csid = 'stager'; # admin
+    #$csid = 'miles'; # should not be involved
+    #$csid = 'nicole';
+    #$csid = 'roycecy';
+    #$csid = 'coopers';
+    #$csid = 'crknight';
+    #$csid = 'mrg';
+    #$csid = 'plotkin';
 
-        # look up person entry
-        $query = $this->db->get_where('people', array('id' => $result->person_id), 1);
-        $result = $query->result();
-        $result = $result[0];
+    $this->csid = $csid;
 
-        $this->id = intval($result->id);
-        $this->first_name = $result->nam_friendly;
-        $this->last_name = $result->nam_last;
-        $this->email_address = $result->primary_csalias . '@cs.stanford.edu';
+    # look up person_id
+    $query = $this->db->get_where('csaliases', array('cs_name' => $csid), 1);
+    $result = $query->result();
+    $result = $result[0];
 
-        $this->role = $this->_getRole($this->id);
-    }
-  
-    /*
-     * get
-     *
-     * @description get user information
-     * @todo look this up from people table
-     */
-    function get()
-    {
-      $result = array(
-          'id' => $this->id,
-          'first_name' => $this->first_name,
-          'last_name' => $this->last_name,
-          'csid' => $this->csid
-      );
+    # look up person entry
+    $query = $this->db->get_where('people', array('id' => $result->person_id), 1);
+    $result = $query->result();
+    $result = $result[0];
 
-      if (!is_null($this->role))
-        $result['role'] = $this->role;
+    $this->id = intval($result->id);
+    $this->first_name = $result->nam_friendly;
+    $this->last_name = $result->nam_last;
+    $this->email_address = $result->primary_csalias . '@cs.stanford.edu';
 
-      if ($this->transcriptUploaded())
-        $result['transcript'] = true; 
+    $this->role = $this->_getRole($this->id);
+  }
 
-      if ($this->role == 'advisee')
-        $result['advisor_id'] = $this->advisorId();
+  /*
+   * get
+   *
+   * @description get user information
+   * @todo look this up from people table
+   */
+  function get()
+  {
+    $result = array(
+      'id' => $this->id,
+      'first_name' => $this->first_name,
+      'last_name' => $this->last_name,
+      'csid' => $this->csid
+    );
 
-      return $result;
-    }
+    if (!is_null($this->role))
+      $result['role'] = $this->role;
 
-    function fullName()
-    {
-      return $this->first_name . ' ' . $this->last_name;
-    }
+    if ($this->transcriptUploaded())
+      $result['transcript'] = true; 
 
-    function role()
-    {
-      return $this->role;
-    }
+    if ($this->role == 'advisee')
+      $result['advisor_id'] = $this->advisorId();
 
-    function csid()
-    {
-      return $this->csid;
-    }
+    return $result;
+  }
 
-    function transcriptUploaded()
-    {
-      return file_exists('./system/application/static/'.$this->id.'.pdf');
-    }
+  function fullName()
+  {
+    return $this->first_name . ' ' . $this->last_name;
+  }
 
-    /*
-     * id
-     *
-     * @description returns id for current user session
-     * @todo get this from environment variable
-     */
+  function role()
+  {
+    return $this->role;
+  }
+
+  function csid()
+  {
+    return $this->csid;
+  }
+
+  function transcriptUploaded()
+  {
+    return file_exists('./system/application/static/'.$this->id.'.pdf');
+  }
+
+  /*
+   * id
+   *
+   * @description returns id for current user session
+   * @todo get this from environment variable
+   */
     function id()
     {
       return $this->id;
@@ -114,7 +114,7 @@ class User_ctx_model extends CI_Model {
         $criteria[$prefix . 'advisor_id'] = $this->id();
             break;
       case 'admin':
-            // get all petitions
+            /* no filter required - get all petitions */
             break;
       }
       return $criteria;
@@ -160,7 +160,7 @@ class User_ctx_model extends CI_Model {
 
     return array(
       'advisor_email' => $this->parseEmail('advisor_id', $petition),
-      'advisee_email'  => $this->parseEmail('student_id', $petition),
+      'advisee_email' => $this->parseEmail('student_id', $petition),
     );
   }
 
@@ -176,14 +176,16 @@ class User_ctx_model extends CI_Model {
 
     private function _getRole($id)
     {
-      // special cases
-      if ($id == 11354) { // federico.barbagli@cs.stanford.edu
+      /*
+       * special cases
+       */
+      if ($id == 11354) { /* federico.barbagli@cs.stanford.edu (legacy advisor) */
         return 'advisor';
       }
-      //if ($id == 13725) { // Jack Dubie
+      //if ($id == 13725) { /* Jack Dubie */
       //  return 'admin';
       //}
-      // TODO for future Course Advisor add yourself here
+      // TODO Add yourself here future Course Advisor
 
         $query = $this->db->get_where('people_relations', array('person_id' => $id));
         $result = $query->result();

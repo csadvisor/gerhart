@@ -347,7 +347,15 @@ class Petition_model extends CI_Model {
       }
     else
       {
-        return $this->User_ctx_model->getEmails();
+        if ($this->_get('student_id') && $this->_get('advisor_id'))
+          {
+            return array(
+              'advisee_email' => $this->emailForId($this->_get('student_id')),
+              'advisor_email' => $this->emailForId($this->_get('advisor_id')),
+            );
+          }
+        else
+          return $this->User_ctx_model->getEmails();
       }
   }
 
@@ -405,7 +413,6 @@ class Petition_model extends CI_Model {
       echo "MESSAGE:\n$message\n";
     } else {
       mail($to, $subject, $message);
-      //echo "TO: $to\n";
     }
   }
 }
