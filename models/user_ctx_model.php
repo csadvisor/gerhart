@@ -24,6 +24,10 @@ class User_ctx_model extends CI_Model {
     #$csid = 'crknight';
     #$csid = 'mrg';
     #$csid = 'plotkin';
+    #$csid = 'sjovanov';
+    #$csid = 'hanlee';
+    #$csid = 'schneibe';
+    #$csid = 'paulo';
 
     $this->csid = $csid;
 
@@ -126,15 +130,11 @@ class User_ctx_model extends CI_Model {
 
   function emailForId($id)
   {
-    // TODO: handle case where primary_csalias isn't set
-    $query = $this->db->get_where('people', array('id' => $id), 1);
+    $query = $this->db->get_where('csaliases', array('person_id' => $id), 6);
     $result = $query->result();
-    $result = $result[0];
-    $email = $result->primary_csalias . '@cs.stanford.edu';
+    $result = $result[count($result) - 1];
+    $email = $result->cs_name . '@cs.stanford.edu';
     return $email;
-
-    // Do we need call to intval?
-    //return intval($result[0]->advisor_id);
   }
 
   function parseEmail($field, $query)
@@ -159,8 +159,8 @@ class User_ctx_model extends CI_Model {
     $petition = $petitions[0];
 
     return array(
-      'advisor_email' => $this->parseEmail('advisor_id', $petition),
       'advisee_email' => $this->parseEmail('student_id', $petition),
+      'advisor_email' => $this->parseEmail('advisor_id', $petition),
     );
   }
 
