@@ -128,6 +128,7 @@ class User_ctx_model extends CI_Model {
     {
     }
 
+  // TODO this is copy pasted from petitions_model
   function emailForId($id)
   {
     $query = $this->db->get_where('csaliases', array('person_id' => $id), 6);

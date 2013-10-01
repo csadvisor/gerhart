@@ -329,10 +329,10 @@ class Petition_model extends CI_Model {
 
   function emailForId($id)
   {
-    $query = $this->db->get_where('people', array('id' => $id), 1);
+    $query = $this->db->get_where('csaliases', array('person_id' => $id), 6);
     $result = $query->result();
-    $result = $result[0];
-    $email = $result->primary_csalias . '@cs.stanford.edu';
+    $result = $result[count($result) - 1];
+    $email = $result->cs_name . '@cs.stanford.edu';
     return $email;
   }
 
