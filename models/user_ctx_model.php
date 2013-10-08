@@ -28,6 +28,7 @@ class User_ctx_model extends CI_Model {
     #$csid = 'hanlee';
     #$csid = 'schneibe';
     #$csid = 'paulo';
+    #$csid = 'rok';
 
     $this->csid = $csid;
 
@@ -205,6 +206,8 @@ class User_ctx_model extends CI_Model {
               case 5: # FACULTY-COURTESY
                 return 'advisor';
               case 6: # FACULTY-REGULAR
+                return 'advisor';
+              case 26: # STAFF-RES-ASSOC
                 return 'advisor';
               case 30: # FACULTY-VISITING
                 return 'advisor';
