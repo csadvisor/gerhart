@@ -174,7 +174,7 @@ class App extends CI_Controller {
           {
             # HACK: would be nice to use redirect or something here
             header('HTTP/1.1 301 Moved Permanently');
-            header('Location: http://bit.ly/cs_petitions');
+            header('Location: http://cs.stanford.edu/webdb.dev/');
           }
       }
     else

@@ -290,7 +290,7 @@ class Petition_model extends CI_Model {
       '',
       'Your advisee just created a petition. '
       . '"Approve" or "Decline" their request here,'
-      . ' http://j.mp/cs_petitions. If you want to talk with your advisee'
+      . ' http://cs.stanford.edu/webdb.dev/. If you want to talk with your advisee'
       . ' in person before making a decision then "Reply All" to this'
       . ' email and tell them your availability.'
     );
