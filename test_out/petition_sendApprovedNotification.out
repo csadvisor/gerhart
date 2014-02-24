@@ -1,5 +1,5 @@
 ******** start Petition_model test ********
-TO: petitions@cs.stanford.edu, stager@cs.stanford.edu, advisee@cs.stanford.edu
+TO: waivers@cs.stanford.edu, stager@cs.stanford.edu, advisee@cs.stanford.edu
 SUBJECT: Advisor has approved your MSCS waiver request
 MESSAGE:
 Dear Student,
@@ -11,5 +11,5 @@ file until you graduate.
 Sincerely,
 MSCS Petitions Robot
 
-Questions, bugs, or feedback? Email petitions@cs.stanford.edu
+Questions, bugs, or feedback? Email waivers@cs.stanford.edu
 ******** end Petition_model test ********

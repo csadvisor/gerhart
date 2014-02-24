@@ -364,7 +364,7 @@ class Petition_model extends CI_Model {
     /**
      * Fill to array
      */
-    $to = array('petitions@cs.stanford.edu');
+    $to = array('waivers@cs.stanford.edu');
     $emails = $this->getEmails();
     foreach ($roles as $role) {
       switch ($role) {
@@ -389,7 +389,7 @@ class Petition_model extends CI_Model {
       "Sincerely,",
       "MSCS Petitions Robot",
       "",
-      "Questions, bugs, or feedback? Email petitions@cs.stanford.edu",
+      "Questions, bugs, or feedback? Email waivers@cs.stanford.edu",
     );
     $body = array_merge($body, $footer);
     $body = implode("\r\n", $body);

@@ -184,7 +184,7 @@ class User_ctx_model extends CI_Model {
       if ($id == 11354) { /* federico.barbagli@cs.stanford.edu (legacy advisor) */
         return 'advisor';
       }
-      if ($id == 13725 || $id == 14228) { /* Jack Dubie */
+      if ($id == 13725 || $id == 14228) { /* Jack Dubie and Alex Eckert*/
         return 'admin';
       }
 
