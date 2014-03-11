@@ -15,6 +15,7 @@ class User_ctx_model extends CI_Model {
     #$csid = 'federico.barbagli';
     #$csid = 'monica.lam'; # my advisor
     #$csid = 'dan.boneh'; # another advisor
+    #$csid = 'eroberts'; # alex's advisor
     #$csid = 'twangcat'; # another MSCS student
     #$csid = 'stager'; # admin
     #$csid = 'miles'; # should not be involved

@@ -22,6 +22,7 @@ class Petition_model extends CI_Model {
     'created_on', # HACK using this field for date_approved
     'date_approved',
     'last_modified',
+    'reason'
   );
 
   var $_attributes = array();
@@ -307,7 +308,9 @@ class Petition_model extends CI_Model {
       '',
       'Your advisor has approved your MSCS waiver request. Claire Stager'
       . ' (stager@cs.stanford.edu) will print out your waiver and keep it on'
-      . ' file until you graduate.'
+      . ' file until you graduate.',
+      '',
+      'Advisor comment: '.$this->_get('reason')
     );
 
     $this->sendNotification($roles, $subject, $message);
@@ -322,6 +325,8 @@ class Petition_model extends CI_Model {
       '',
       'Your MSCS waiver has been rejected. If you feel there was a mistake email'
       . ' your advisor.',
+      '',
+      'Advisor comment: '.$this->_get('reason')
     );
 
     $this->sendNotification($roles, $subject, $body);
